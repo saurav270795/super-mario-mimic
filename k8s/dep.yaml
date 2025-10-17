@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mario-game
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mario-game
+  template:
+    metadata:
+      labels:
+        app: mario-game
+    spec:
+      containers:
+      - name: mario-container
+        image: sauravsharma27/mario:v1
+        imagePullPolicy: IfNotPresent  
+        ports:
+        - containerPort: 3200
+      imagePullSecrets:
+      - name: regcred   
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mario-service
+spec:
+  selector:
+    app: mario-game
+  type: NodePort
+  ports:
+  - port: 3000
+    targetPort: 3200
+    nodePort: 30002

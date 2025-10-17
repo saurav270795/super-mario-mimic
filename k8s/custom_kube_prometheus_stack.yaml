@@ -1,0 +1,114 @@
+# ================================
+# Production-grade Prometheus Stack
+# ================================
+
+# -------------------------------
+# Grafana Configuration
+# -------------------------------
+grafana:
+  adminUser: admin
+  adminPassword: "admin"  # 🔒 Change this in production
+  defaultDashboardsEnabled: true
+
+  persistence:
+    enabled: true
+    type: pvc
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+    storageClassName: "openebs-hostpath"   # set to your storage class, e.g. gp2, standard, local-path
+
+  service:
+    type: NodePort
+    nodePort: 30015
+    port: 80
+
+  resources:
+    requests:
+      cpu: 400m
+      memory: 256Mi
+    limits:
+      cpu: 600m
+      memory: 512Mi
+
+  # Optional: expose Grafana externally through an Ingress
+  # ingress:
+  #   enabled: true
+  #   annotations:
+  #     kubernetes.io/ingress.class: nginx
+  #   hosts:
+  #     - grafana.example.com
+
+# -------------------------------
+# Prometheus Configuration
+# -------------------------------
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    scrapeInterval: 30s
+    evaluationInterval: 30s
+    replicas: 1
+
+    # Persistent storage for Prometheus data
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 50Gi
+          storageClassName: "openebs-hostpath"  # set to your cluster storage class
+
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 2
+        memory: 3Gi
+
+# -------------------------------
+# Alertmanager Configuration
+# -------------------------------
+alertmanager:
+  alertmanagerSpec:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 2Gi
+          storageClassName: "openebs-hostpath"
+
+# -------------------------------
+# Node Exporter
+# -------------------------------
+prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+# -------------------------------
+# Kube State Metrics
+# -------------------------------
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi

@@ -1,0 +1,25 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+ name: mario-gateway
+spec:
+ selector:
+  istio: ingressgateway
+ servers:
+ - port:
+    number: 80
+    name: http
+    protocol: HTTP
+   hosts:
+   - "mario-test.com"
+   tls:
+     httpsRedirect: true # Redirect HTTP → HTTPS 
+ - port:
+    number: 443
+    name: https
+    protocol: HTTPS
+   hosts:
+   - "mario-test.com"
+   tls:
+    mode: SIMPLE
+    credentialName: mario-credential

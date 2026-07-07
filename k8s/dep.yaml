@@ -4,7 +4,7 @@ metadata:
   name: mario-game
   namespace: mario
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: mario-game
